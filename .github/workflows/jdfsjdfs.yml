@@ -1,0 +1,38 @@
+name: lk2nd build
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on: push
+
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+    
+    - name: Initialization environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y device-tree-compiler gcc-arm-none-eabi git libfdt-dev curl
+    - name: Downloading source code
+      run: |
+        git clone https://github.com/00p513-dev/lk2nd ~/lk2nd
+    - name: Build 
+      run: |
+        make TOOLCHAIN_PREFIX=arm-none-eabi- msm8953-secondary
+        pwd
+        ls
+    - name : Upload boot image
+      uses: actions/upload-artifact@master
+      with:
+        name: lk2nd lvgl image
+        path: /home/runner/work/lk2nd/lk2nd/build-msm8953-secondary/lk2nd.img
+    - name : Upload boot image
+      uses: actions/upload-artifact@master
+      with:
+        name: lk2nd zImage
+        path: /home/runner/work/lk2nd/lk2nd/build-msm8953-secondary/zImage+dtb
